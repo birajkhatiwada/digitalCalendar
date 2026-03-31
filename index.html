@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Top GIF + HUD -->
+    <div id="topSection">
+      <!-- <div id="bgLayer">
+        <div
+          class="tenor-gif-embed"
+          data-postid="3878735100212326222"
+          data-share-method="host"
+          data-aspect-ratio="1"
+          data-width="100%"
+        >
+          <a
+            href="https://tenor.com/view/rain-minecraft-minecraft-rain-minceraft-gif-3878735100212326222"
+            >Rain Minecraft Sticker</a
+          >
+          from
+          <a href="https://tenor.com/search/rain-stickers">Rain Stickers</a>
+        </div>
+        <script
+          type="text/javascript"
+          async
+          src="https://tenor.com/embed.js"
+        ></script>
+      </div> -->
+
+      <!-- HUD bar: full width, big fonts -->
+      <div class="hud-bar">
+        <div class="clock" id="clock">00:00</div>
+        <div class="weather">
+          <div id="weatherIcon" class="weather-icon">☀️</div>
+          <div id="temperature" class="temp">--°F</div>
+          <!-- <div id="description" class="desc">Current Weather</div> -->
+        </div>
+      </div>
+      <!-- 7-Day Forecast -->
+      <div class="forecast-container">
+        <div class="forecast-day" id="day0"></div>
+        <div class="forecast-day" id="day1"></div>
+        <div class="forecast-day" id="day2"></div>
+        <div class="forecast-day" id="day3"></div>
+        <div class="forecast-day" id="day4"></div>
+        <div class="forecast-day" id="day5"></div>
+        <div class="forecast-day" id="day6"></div>
+      </div>
+    </div>
+
+    <!-- Calendar bottom -->
+    <div class="calendar-container">
+      <iframe
+        class="calendar"
+        src="https://calendar.google.com/calendar/embed?src=bf70d8cb0eafe0494d0f802c6f10a5a564d793262d0b97cfb2bfb5594fe3f647%40group.calendar.google.com&ctz=America%2FLos_Angeles&mode=MONTH&showTitle=0&showNav=0&showTabs=0&showPrint=0"
+        scrolling="no"
+      >
+      </iframe>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

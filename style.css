@@ -1,0 +1,124 @@
+/* Basic reset */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  color: #000;
+  background-color: rgb(187, 240, 226);
+}
+
+/* Top section */
+#topSection {
+  position: relative;
+  /* height: 30vh; */
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Background GIF */
+#bgLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  overflow: hidden;
+}
+.tenor-gif-embed,
+.tenor-gif-embed iframe {
+  position: absolute !important;
+  top: 50%;
+  left: 50%;
+  width: 200% !important;
+  height: 200% !important;
+  transform: translate(-50%, -50%);
+}
+
+/* HUD bar: full width, big fonts */
+.hud-bar {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;
+  /* width: 100%; */
+  /* padding: 20px 0; */
+  font-weight: bold;
+  box-sizing: border-box;
+  gap: 70px;
+}
+
+/* Clock */
+.clock {
+  /* flex: 1; */
+  /* text-align: left; */
+  font-size: 6.5em;
+}
+
+/* Current weather: icon + temp + desc inline */
+.weather {
+  /* flex: 1; */
+  text-align: right;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  font-size: 3.5em;
+}
+.weather-icon {
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+.temp {
+  font-size: 2.2em;
+}
+.desc {
+  font-size: 1em;
+  vertical-align: middle;
+}
+
+/* 7-Day Forecast */
+.forecast-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90vw;
+  margin: 10px auto;
+  margin-bottom: 20px;
+}
+.forecast-day {
+  flex: 1;
+  text-align: center;
+  font-size: 20px; /* slightly bigger */
+  padding: 5px;
+}
+
+/* Calendar bottom */
+.calendar-container {
+  height: 80vh;
+  width: 90vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.calendar {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+}
+.calendar {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #111; /* fallback background */
+
+  /* DARK MODE EFFECT */
+  filter: invert(1) hue-rotate(180deg) brightness(0.9);
+}
