@@ -1,71 +1,198 @@
-// Clock
+/* CONFIGURATION */
+const WEATHER_API_KEY = "10a26ae0bda63e8d7ca6bf4f525c554c";
+const CALENDAR_ID =
+  "bf70d8cb0eafe0494d0f802c6f10a5a564d793262d0b97cfb2bfb5594fe3f647@group.calendar.google.com";
+
+/* CLOCK */
 function updateClock() {
   const now = new Date();
-  const time = now.toLocaleTimeString([], {
+  document.getElementById("time").innerText = now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
   });
-  document.getElementById("clock").innerText = time;
 }
-setInterval(updateClock, 1000);
-updateClock();
 
-// Weather (current + 7-day forecast)
+/* WEATHER */
 async function loadWeather() {
-  const lat = 37.77,
-    lon = -122.27; // replace with your location
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&current_weather=true&timezone=America/Los_Angeles`;
-  const res = await fetch(url);
-  const data = await res.json();
+  const lat = 37.7652; // Emeryville coordinates
+  const lon = -122.2416;
 
-  // Current weather
-  const temp = data.current_weather.temperature;
-  const code = data.current_weather.weathercode;
-  document.getElementById("temperature").innerText = temp + "°F";
-  //   document.getElementById("description").innerText = "Current Weather";
+  try {
+    /*
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${WEATHER_API_KEY}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch weather data");
+    const data = await response.json();
+    */
+    const data = {
+      list: [
+        {
+          dt_txt: "2026-04-01 12:00:00",
+          main: { temp: 65 },
+          weather: [{ main: "Clear" }],
+        },
+        {
+          dt_txt: "2026-04-02 12:00:00",
+          main: { temp: 62 },
+          weather: [{ main: "Clouds" }],
+        },
+        {
+          dt_txt: "2026-04-03 12:00:00",
+          main: { temp: 60 },
+          weather: [{ main: "Rain" }],
+        },
+        {
+          dt_txt: "2026-04-04 12:00:00",
+          main: { temp: 68 },
+          weather: [{ main: "Clear" }],
+        },
+        {
+          dt_txt: "2026-04-05 12:00:00",
+          main: { temp: 70 },
+          weather: [{ main: "Clouds" }],
+        },
+      ],
+    };
 
-  let icon = "☀️";
-  if (code === 0) {
-    icon = "☀️";
-  } else if (code >= 1 && code <= 3) {
-    icon = "⛅";
-  } else if (code >= 51 && code <= 67) {
-    icon = "🌧";
-  } else if (code >= 71 && code <= 77) {
-    icon = "❄️";
-  } else if (code >= 80 && code <= 82) {
-    icon = "🌦";
-  } else if (code >= 95) {
-    icon = "⛈";
-  }
-  document.getElementById("weatherIcon").innerText = icon;
+    if (data && data.list) {
+      const current = data.list[0];
+      document.getElementById("temperature").innerText =
+        Math.round(current.main.temp) + "°F";
+      document.getElementById("weatherIcon").innerText = getWeatherEmoji(
+        current.weather[0].main
+      );
+      updateWeatherGif(current.weather[0].main);
 
-  // 7-Day forecast
-  for (let i = 0; i < 7; i++) {
-    const dayEl = document.getElementById(`day${i}`);
-    const date = new Date(data.daily.time[i]);
-    const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
-    const maxTemp = Math.round(data.daily.temperature_2m_max[i]);
-    const minTemp = Math.round(data.daily.temperature_2m_min[i]);
-    const wcode = data.daily.weathercode[i];
-    let wicon = "☀️";
-    if (wcode === 0) {
-      wicon = "☀️";
-    } else if (wcode >= 1 && wcode <= 3) {
-      wicon = "⛅";
-    } else if (wcode >= 51 && wcode <= 67) {
-      wicon = "🌧";
-    } else if (wcode >= 71 && wcode <= 77) {
-      wicon = "❄️";
-    } else if (wcode >= 80 && wcode <= 82) {
-      wicon = "🌦";
-    } else if (wcode >= 95) {
-      wicon = "⛈";
+      createForecast(data.list);
     }
-
-    dayEl.innerHTML = `<div>${dayName}</div><div>${wicon}</div><div>${maxTemp}°/${minTemp}°</div>`;
+  } catch (err) {
+    console.error("Weather error:", err);
+    document.getElementById("temperature").innerText = "--";
+    document.getElementById("weatherIcon").innerText = "❓";
+    document.getElementById("weatherGif").src = "";
+    document.getElementById("forecast").innerHTML = "Unable to load forecast.";
   }
 }
 
-loadWeather();
-setInterval(loadWeather, 600000); // every 10 mins
+function getWeatherEmoji(type) {
+  const map = {
+    Clear: "☀️",
+    Clouds: "☁️",
+    Rain: "🌧",
+    Snow: "❄️",
+    Thunderstorm: "⛈",
+    Drizzle: "🌦",
+    Mist: "🌫",
+  };
+  return map[type] || "⛅";
+}
+
+function updateWeatherGif(type) {
+  const tempgif =
+    "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzR3ZWFxMmpiNmMxM2pxbzk4djU2dms0bHJvbGlyZnY2dGdyMTFsMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/RUsxabj8qvFbWl3FWL/giphy.gif";
+  const gifs = {
+    Clear: tempgif,
+    Clouds: tempgif,
+    Rain: tempgif,
+    Snow: tempgif,
+    Thunderstorm: tempgif,
+    Drizzle: tempgif,
+    Mist: tempgif,
+  };
+  const gifEl = document.getElementById("weatherGif");
+  gifEl.src = gifs[type] || gifs["Clouds"];
+  gifEl.style.width = "300px";
+  gifEl.style.height = "300px";
+  gifEl.style.objectFit = "contain";
+}
+
+function createForecast(list) {
+  const forecastEl = document.getElementById("forecast");
+  forecastEl.innerHTML = "";
+  const daysAdded = new Set();
+
+  for (const item of list) {
+    const date = new Date(item.dt_txt);
+    const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+
+    if (!daysAdded.has(dayName) && daysAdded.size < 5) {
+      daysAdded.add(dayName);
+      const div = document.createElement("div");
+      div.className = "forecast-day";
+      div.innerHTML = `
+        <div>${dayName}</div>
+        <div>${getWeatherEmoji(item.weather[0].main)}</div>
+        <div>${Math.round(item.main.temp)}°</div>
+      `;
+      forecastEl.appendChild(div);
+    }
+  }
+}
+
+/* GOOGLE CALENDAR (PUBLIC CALENDAR USING API KEY) */
+let calendar;
+
+async function loadCalendarEvents() {
+  try {
+    const calendarEl = document.getElementById("calendar");
+    calendarEl.innerHTML = ""; // Clear previous calendar if any
+
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      height: "100%",
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek",
+      },
+      events: async function (info, successCallback, failureCallback) {
+        try {
+          const response = await fetch(
+            `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
+              CALENDAR_ID
+            )}/events?timeMin=${encodeURIComponent(
+              info.startStr
+            )}&timeMax=${encodeURIComponent(
+              info.endStr
+            )}&showDeleted=false&singleEvents=true&orderBy=startTime&key=AIzaSyAtgoqgNiyVl4K1QPRPJsoDtlb8K2ByGIQ`
+          );
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error("Google Calendar API error:", data);
+            throw new Error(
+              data?.error?.message || "Failed to fetch calendar events"
+            );
+          }
+          const events = (data.items || []).map((event) => {
+            return {
+              title: event.summary,
+              start: event.start.dateTime || event.start.date,
+              end: event.end.dateTime || event.end.date,
+            };
+          });
+          successCallback(events);
+        } catch (err) {
+          console.error("Error fetching calendar events:", err);
+          failureCallback(err);
+        }
+      },
+    });
+
+    calendar.render();
+  } catch (err) {
+    console.error("Error initializing calendar:", err);
+  }
+}
+
+/* MAIN INITIALIZATION */
+document.addEventListener("DOMContentLoaded", () => {
+  updateClock();
+  setInterval(updateClock, 1000);
+  loadWeather();
+
+  loadCalendarEvents();
+});
