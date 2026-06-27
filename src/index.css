@@ -1,0 +1,38 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:       #0d0d0f;
+  --surface:  #161618;
+  --surface2: #1e1e21;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --text:     #e8e8ea;
+  --muted:    #6b6b72;
+  --accent:   #c8f0a0;
+  --accent2:  #7eb8f7;
+  --accent3:  #f0c080;
+  --danger:   #f07080;
+  --sans:     'Syne', sans-serif;
+  --mono:     'DM Mono', monospace;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+button {
+  font-family: var(--sans);
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
