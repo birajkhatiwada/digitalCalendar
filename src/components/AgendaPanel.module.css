@@ -1,17 +1,18 @@
 .panel {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 28px 28px;
+  padding: 8px 28px 28px;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 4px;
   min-height: 0;
 }
 
+/* Auth states */
 .status {
   font-size: 13px;
   color: var(--muted);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .hint {
@@ -38,14 +39,68 @@
   cursor: pointer;
   width: fit-content;
   transition: opacity 0.15s;
+  margin-top: 4px;
 }
 
-.signInBtn:hover {
-  opacity: 0.85;
+.signInBtn:hover { opacity: 0.85; }
+
+/* Happening now */
+.nowSection {
+  background: rgba(200, 240, 160, 0.06);
+  border: 1px solid rgba(200, 240, 160, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
 }
 
+.nowLabel {
+  font-size: 9px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+/* Countdown banner */
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+}
+
+.countdownLabel {
+  font-size: 9px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.countdownEvent {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.countdownTime {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--accent2);
+  flex-shrink: 0;
+}
+
+/* Day groups */
 .group {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .groupLabel {
@@ -54,27 +109,26 @@
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--accent);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .empty {
   font-size: 12px;
   color: var(--muted);
   font-family: var(--mono);
-  padding: 4px 0;
+  padding: 3px 0;
 }
 
+/* Event row */
 .event {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 8px 0;
+  padding: 7px 0;
   border-bottom: 1px solid var(--border);
 }
 
-.event:last-child {
-  border-bottom: none;
-}
+.event:last-child { border-bottom: none; }
 
 .dot {
   width: 7px;
@@ -87,7 +141,7 @@
 .eventBody {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .eventTitle {
@@ -96,28 +150,80 @@
   line-height: 1.4;
 }
 
-.eventTime {
+.eventMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
   color: var(--muted);
   font-family: var(--mono);
 }
 
-.signOutBtn {
-  margin-top: auto;
-  padding-top: 16px;
-  background: none;
-  border: 1px solid var(--border2);
-  color: var(--muted);
-  border-radius: 7px;
-  padding: 6px 14px;
-  font-size: 11px;
-  font-family: var(--mono);
-  cursor: pointer;
-  width: fit-content;
-  transition: border-color 0.15s, color 0.15s;
+.calBadge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 20px;
+  border: 1px solid;
+  opacity: 0.8;
+  letter-spacing: 0.3px;
 }
 
-.signOutBtn:hover {
-  border-color: var(--muted);
+/* Tasks */
+.tasksSection {
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.tasksSectionLabel {
+  font-size: 9px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent3);
+  margin-bottom: 8px;
+}
+
+.task {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.task:last-child { border-bottom: none; }
+
+.taskBullet {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent3);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.taskBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.taskTitle {
+  font-size: 13px;
   color: var(--text);
+}
+
+.taskMeta {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.taskDue {
+  color: var(--muted);
+}
+
+.taskDue.overdue {
+  color: var(--danger);
 }

@@ -1,7 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'
-const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
+const DISCOVERY_DOCS = [
+  'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
+  'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest',
+]
+const SCOPES = [
+  'https://www.googleapis.com/auth/calendar.readonly',
+  'https://www.googleapis.com/auth/tasks.readonly',
+].join(' ')
 
 function loadScript(src) {
   return new Promise(resolve => {
@@ -15,8 +21,9 @@ function loadScript(src) {
 
 export default function useGoogleCalendar(clientId) {
   const [events, setEvents] = useState([])
+  const [tasks, setTasks] = useState([])
   const [calendars, setCalendars] = useState({})
-  const [authState, setAuthState] = useState('loading') // loading | no-client-id | signed-out | signed-in | error
+  const [authState, setAuthState] = useState('loading')
   const tokenClientRef = useRef(null)
 
   const fetchEvents = useCallback(async () => {
@@ -26,16 +33,14 @@ export default function useGoogleCalendar(clientId) {
 
       const calMap = {}
       calList.forEach(cal => {
-        calMap[cal.id] = {
-          name: cal.summary,
-          color: cal.backgroundColor ?? '#7eb8f7',
-        }
+        calMap[cal.id] = { name: cal.summary, color: cal.backgroundColor ?? '#7eb8f7' }
       })
       setCalendars(calMap)
 
+      // Fetch from start of current month through 60 days ahead (covers grid + 7-day agenda)
       const now = new Date()
       const timeMin = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-      const timeMax = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59).toISOString()
+      const timeMax = new Date(now.getFullYear(), now.getMonth() + 2, 14).toISOString()
 
       const all = []
       await Promise.all(
@@ -70,18 +75,61 @@ export default function useGoogleCalendar(clientId) {
     }
   }, [])
 
-  useEffect(() => {
-    if (!clientId) {
-      setAuthState('no-client-id')
-      return
+  const fetchTasks = useCallback(async () => {
+    try {
+      const listsRes = await window.gapi.client.tasks.tasklists.list({ maxResults: 20 })
+      const lists = listsRes.result.items ?? []
+
+      const all = []
+      await Promise.all(
+        lists.map(async list => {
+          const res = await window.gapi.client.tasks.tasks.list({
+            tasklist:      list.id,
+            maxResults:    100,
+            showCompleted: false,
+            showHidden:    false,
+          })
+          ;(res.result.items ?? []).forEach(task => {
+            if (!task.title) return
+            all.push({
+              id:       task.id,
+              title:    task.title,
+              due:      task.due ? task.due.substring(0, 10) : null,
+              notes:    task.notes ?? null,
+              listName: list.title,
+              status:   task.status,
+            })
+          })
+        })
+      )
+
+      // Sort: tasks with due dates first, then by due date
+      all.sort((a, b) => {
+        if (!a.due && !b.due) return 0
+        if (!a.due) return 1
+        if (!b.due) return -1
+        return a.due.localeCompare(b.due)
+      })
+
+      setTasks(all)
+    } catch (e) {
+      console.error('Tasks fetch error:', e)
     }
+  }, [])
+
+  const fetchAll = useCallback(async () => {
+    await Promise.all([fetchEvents(), fetchTasks()])
+  }, [fetchEvents, fetchTasks])
+
+  useEffect(() => {
+    if (!clientId) { setAuthState('no-client-id'); return }
 
     async function init() {
       await Promise.all([
         loadScript('https://apis.google.com/js/api.js').then(
           () => new Promise(resolve => {
             window.gapi.load('client', async () => {
-              await window.gapi.client.init({ discoveryDocs: [DISCOVERY_DOC] })
+              await window.gapi.client.init({ discoveryDocs: DISCOVERY_DOCS })
               resolve()
             })
           })
@@ -91,31 +139,28 @@ export default function useGoogleCalendar(clientId) {
 
       tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
         client_id: clientId,
-        scope: SCOPES,
-        callback: async response => {
+        scope:     SCOPES,
+        callback:  async response => {
           if (response.error) { setAuthState('signed-out'); return }
           window.gapi.client.setToken({ access_token: response.access_token })
           setAuthState('signed-in')
-          await fetchEvents()
+          await fetchAll()
         },
         error_callback: () => setAuthState('signed-out'),
       })
 
-      // Attempt silent re-auth first
       tokenClientRef.current.requestAccessToken({ prompt: '' })
     }
 
     init()
-  }, [clientId, fetchEvents])
+  }, [clientId, fetchAll])
 
-  // Refresh events every 5 min
   useEffect(() => {
     if (authState !== 'signed-in') return
-    const id = setInterval(fetchEvents, 5 * 60 * 1000)
+    const id = setInterval(fetchAll, 5 * 60 * 1000)
     return () => clearInterval(id)
-  }, [authState, fetchEvents])
+  }, [authState, fetchAll])
 
-  // Refresh token every 45 min (tokens expire after 60 min)
   useEffect(() => {
     if (authState !== 'signed-in') return
     const id = setInterval(() => {
@@ -128,16 +173,5 @@ export default function useGoogleCalendar(clientId) {
     tokenClientRef.current?.requestAccessToken({ prompt: 'consent' })
   }, [])
 
-  const signOut = useCallback(() => {
-    const token = window.gapi?.client.getToken()
-    if (token) {
-      window.google.accounts.oauth2.revoke(token.access_token)
-      window.gapi.client.setToken(null)
-    }
-    setEvents([])
-    setCalendars({})
-    setAuthState('signed-out')
-  }, [])
-
-  return { events, calendars, authState, signIn, signOut, refetch: fetchEvents }
+  return { events, tasks, calendars, authState, signIn }
 }

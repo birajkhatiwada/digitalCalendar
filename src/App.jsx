@@ -10,7 +10,7 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
 export default function App() {
   const [selectedDate, setSelectedDate] = useState(new Date())
-  const { events, authState, signIn, signOut } = useGoogleCalendar(CLIENT_ID)
+  const { events, tasks, calendars, authState, signIn } = useGoogleCalendar(CLIENT_ID)
 
   return (
     <div className={styles.app}>
@@ -27,9 +27,10 @@ export default function App() {
         <WeatherWidget />
         <AgendaPanel
           events={events}
+          tasks={tasks}
+          calendars={calendars}
           authState={authState}
           onSignIn={signIn}
-          onSignOut={signOut}
           selectedDate={selectedDate}
         />
       </div>
